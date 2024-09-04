@@ -4,5 +4,11 @@
 #include <ctype.h>
 #include <stdbool.h> 
 #include <stdio.h>
+#include <unistd.h>
+
+extern FILE* archivo;
+
+int obtenerCaracter();
+char* obtenerToken();
 
 #endif //SCANNER_H_INCLUDED
