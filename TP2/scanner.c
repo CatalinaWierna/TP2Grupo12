@@ -16,7 +16,7 @@ struct AtributosCaracter {
     char caracter;
 };
 
-int tabalTransicion [7] [8] = {
+int tablaTransicion [7] [8] = {
     {0,1,2,3,4,5,6,200},
     {100,1,1,100,100,100,100,200},
     {101,200,2,101,101,101,101,200},
@@ -79,4 +79,25 @@ int obtenerFila (){
     else{
         return estadoAcumulado;
     }
+}
+
+char* obtenerToken(){
+    int caracterAscii;
+    while(caracterAscii != -1){
+        caracterAscii = obtenerCaracter();
+        char caracter = (char)caracterAscii;
+        printf("%c", caracter); // Para ver lo que printea. 
+    } // Falta Seudocodigo para TT
+}
+
+int obtenerCaracter()
+{
+    int caracterAscii;
+    if(archivo == NULL){
+        printf("No se pudo abrir el archivo.\n");
+        return 1;
+    }
+    caracterAscii = getc(archivo);
+
+    return caracterAscii;
 }
