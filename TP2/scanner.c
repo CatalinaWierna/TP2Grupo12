@@ -84,13 +84,13 @@ int obtenerFila (){
 char* obtenerToken(){
     int caracterAscii;
     while(caracterAscii != -1){
-        caracterAscii = obtenerCaracter();
+        caracterAscii = getc(archivo);
         char caracter = (char)caracterAscii;
         printf("%c", caracter); // Para ver lo que printea. 
     } // Falta Seudocodigo para TT
 }
 
-int obtenerCaracter()
+/*int obtenerCaracter()
 {
     int caracterAscii;
     if(archivo == NULL){
@@ -100,4 +100,4 @@ int obtenerCaracter()
     caracterAscii = getc(archivo);
 
     return caracterAscii;
-}
+}*/
