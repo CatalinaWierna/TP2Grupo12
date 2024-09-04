@@ -10,7 +10,7 @@ int main()
     token = obtenerToken(); 
     // do{
     //    token = obtenerToken();
-    // } while (token != "FDT");
+    // } while (token != "FDT");  --> Eze: hasta donde lei el "FDT" es el EOF (End Of File) asi que creo que directamente hagamos token != EOF
     // Se usa a futuro
 
     fclose(archivo);

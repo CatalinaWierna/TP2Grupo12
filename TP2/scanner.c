@@ -94,9 +94,9 @@ int obtenerCaracter()
 {
     int caracterAscii;
     if(archivo == NULL){
-        printf("No se pudo abrir el archivo.\n");
-        return 1;
-    }
+        printf("No se pudo abrir el archivo.\n"); // Ezequiel:¿realmente esta funcion se debe encargar de verificar si el archivo == NULL?
+        return 1;                                 //          ¿No es algo que deberia haberse verificado en main.c?
+    }                                             //          y de ser asi, si quitamos el if, no seria mejor usar directamente el getc(archivo) en vez de la funcion
     caracterAscii = getc(archivo);
 
     return caracterAscii;
