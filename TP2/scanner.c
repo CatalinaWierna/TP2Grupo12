@@ -83,21 +83,8 @@ int obtenerFila (){
 
 char* obtenerToken(){
     int caracterAscii;
-    while(caracterAscii != -1){
-        caracterAscii = getc(archivo);
-        char caracter = (char)caracterAscii;
-        printf("%c", caracter); // Para ver lo que printea. 
-    } // Falta Seudocodigo para TT
+    while((caracterAscii = getc(archivo))!= EOF){
+        putchar(caracterAscii); // EZE: esta funcion imprime el caracter que va leyendo, no se si es necesario pero para ir viendo supongo que esta bien 
+    }
+     // Falta Seudocodigo para TT
 }
-
-/*int obtenerCaracter()
-{
-    int caracterAscii;
-    if(archivo == NULL){
-        printf("No se pudo abrir el archivo.\n"); // Ezequiel:¿realmente esta funcion se debe encargar de verificar si el archivo == NULL?
-        return 1;                                 //          ¿No es algo que deberia haberse verificado en main.c?
-    }                                             //          y de ser asi, si quitamos el if, no seria mejor usar directamente el getc(archivo) en vez de la funcion
-    caracterAscii = getc(archivo);
-
-    return caracterAscii;
-}*/
