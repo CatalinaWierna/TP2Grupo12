@@ -16,7 +16,7 @@ struct AtributosCaracter {
     char caracter;
 };
 
-int tabalTransicion [7] [8] = {
+int tablaTransicion [7] [8] = {
     {0,1,2,3,4,5,6,200},
     {100,1,1,100,100,100,100,200},
     {101,200,2,101,101,101,101,200},
