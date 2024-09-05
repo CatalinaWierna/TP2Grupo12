@@ -12,11 +12,9 @@ int main()
         fclose(archivo);
         return 1;
     }
-
-    token = obtenerToken(); 
-    do{
-        token = obtenerToken();
-    } while (token != EOF);
+    else {
+        scanear(archivo);
+    }
 
 
     fclose(archivo);

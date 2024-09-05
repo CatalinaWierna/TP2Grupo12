@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
-extern FILE* archivo;
 
-char* obtenerToken();
+
+void scanear(FILE* archivo);
 
 #endif //SCANNER_H_INCLUDED

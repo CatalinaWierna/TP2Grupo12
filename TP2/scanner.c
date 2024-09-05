@@ -11,11 +11,6 @@ enum EstadosPrincipales {
     ERROR = 200,
 };
 
-struct AtributosCaracter {
-    int estado;
-    char caracter;
-};
-
 int tablaTransicion [7] [8] = {
     {0,1,2,3,4,5,6,200},
     {100,1,1,100,100,100,100,200},
@@ -60,17 +55,6 @@ int obtenerColumna (char caracter){
 
 }
 
-struct AtributosCaracter iniciarAtributos(char c){
-    struct AtributosCaracter attrCaracter;
-    attrCaracter.caracter = c;
-    if (nuevoLexema){
-        attrCaracter.estado = 0;
-    }
-    else {
-        attrCaracter.estado = estadoAcumulado;
-    }
-    return attrCaracter;
-}
 
 int obtenerFila (){
     if(nuevoLexema){
@@ -81,43 +65,127 @@ int obtenerFila (){
     }
 }
 
-char* obtenerToken(){
+int obtenerEstado (char caracter){
+    int columna = obtenerColumna(caracter);
+    return tablaTransicion[columna][estadoAcumulado];
+
+}
+
+char* tokenDeError (char* bufferLexema){
+    char* msjError = NULL;
+    if (strcmp("=",bufferLexema)){
+        msjError = (char*) malloc(strlen("Error de asignacion =") + 1);
+        strcpy(msjError, "Error de asignacion =");
+    }
+    else if(strcmp(":",bufferLexema)){
+        msjError = (char*) malloc(strlen("Error de asignacion :") + 1);
+        strcpy(msjError, "Error de asignacion =");
+    }
+    else {
+        msjError = (char*) malloc(strlen("Error comun") + 1);
+        strcpy(msjError, "Error comun");
+    }
+    return msjError;
+}
+
+char* tokenAceptor (char* bufferLexema){
+    char* msjAceptor = NULL;
+    if(strcmp(";",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Punto y Coma") + 1);
+        strcpy(msjAceptor, "Punto y Coma");
+    }
+    else if(strcmp("(",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Parentesis que abre") + 1);
+        strcpy(msjAceptor, "Parentesis que abre");
+    }
+    else if(strcmp(")",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Parentesis que cierra") + 1);
+        strcpy(msjAceptor, "Parentesis que cierra");
+    }
+    else if(strcmp(",",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Coma") + 1);
+        strcpy(msjAceptor, "Coma");
+    }
+    else if(strcmp(":=",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Asignacion") + 1);
+        strcpy(msjAceptor, "Asignacion");
+    }
+    else if(strcmp("*",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Multiplicacion") + 1);
+        strcpy(msjAceptor, "Multiplicacion");
+    }
+    else if(strcmp("-",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Menos") + 1);
+        strcpy(msjAceptor, "Menos");
+    }
+    else if(strcmp("+",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Mas") + 1);
+        strcpy(msjAceptor, "Mas");
+    }
+    else if(strcmp("/",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Division") + 1);
+        strcpy(msjAceptor, "Division");
+    }
+    else if(strcmp("%",bufferLexema)){
+        msjAceptor = (char*) malloc(strlen("Resto") + 1);
+        strcpy(msjAceptor, "Resto");
+    }
+    else{
+        msjAceptor = (char*) malloc(strlen("Identificador") + 1);
+        strcpy(msjAceptor, "Identificador");
+    }
+
+}
+
+void scanear(FILE* archivo){
     
     static char bufferlexema[200];
+    int caracteresError;
     int caracterAscii;
     int indicebuffer = 0;
 
-    while ((caracterAscii = getc(archivo)) != EOF) {
+    while ((caracterAscii = fgetc(archivo)) != EOF) {
     putchar(caracterAscii);
 
-    int columna = obtenerColumna((char)caracterAscii);
-    estadoAcumulado = tablaTransicion[columna][estadoAcumulado];
+    estadoAcumulado = obtenerEstado ((char)caracterAscii);
 
     if (estadoAcumulado >= ERROR) {
+        while ((caracteresError = getc(archivo)) != EOF){//Tuve que agregar este bucle, ya que si hay un caracter que tira error, hay que leer toda la cadena hasta que finaliza
+            if(isspace((char)caracteresError)){
+                break;
+            }
+            else{
+                bufferlexema[indicebuffer] = caracteresError;
+                bufferlexema[indicebuffer+1]='\0';
+                indicebuffer++;
+            }
+        }
+        char* error = tokenDeError (bufferlexema);
+        printf("%s   %s\n",error,bufferlexema);
+        free(error);
         bool nuevoLexema = true;
-        bufferlexema[indicebuffer] = '\0'; 
         estadoAcumulado = INICIO;
-        
         indicebuffer = 0;
-        return bufferlexema;
+        memset(bufferlexema,'\0',200); //Esto pone en cero al buffer  
     } 
     else if (estadoAcumulado >= ACEPTOR) {
-        bool nuevoLexema = true;
-        bufferlexema[indicebuffer] = '\0';
+        if(!isspace(caracterAscii)){//Tengo que chequear que el siguiente caracter no sea parte de otro lexema, si lo es lo vuelvo a dejar en el flujo Ej: 4+5
+            ungetc(caracterAscii,archivo);
+        }
+        char* aceptor = tokenAceptor(bufferlexema);
+        printf("%s   %s\n",aceptor,bufferlexema);
+        free(aceptor);
         estadoAcumulado = INICIO;
-
-        indicebuffer = 0;     
-        return bufferlexema;
+        bool nuevoLexema = true;
+        indicebuffer = 0;
+        memset(bufferlexema,'\0',200);     
     } 
     else if (estadoAcumulado >= INTERMEDIO) {
         bool nuevoLexema = false;
         bufferlexema[indicebuffer] = caracterAscii;
-
+        bufferlexema[indicebuffer+1]='\0';
         indicebuffer++;
     }
 }
 
-    bufferlexema[indicebuffer] = '\0';
-
-    return bufferlexema;
 }
