@@ -55,13 +55,18 @@ int obtenerColumna (char caracter){
 
 }
 
-
-
-
 int obtenerEstado (char caracter){
     int columna = obtenerColumna(caracter);
     return tablaTransicion[columna][estadoAcumulado];
 
+}
+
+char* asignacionDeMensaje(const char* mensaje){
+    char *mensajeAceptor = (char*) malloc(strlen(mensaje) +1);
+    if (mensajeAceptor != NULL){
+        strcpy(mensajeAceptor, mensaje);
+    }
+    return mensajeAceptor;
 }
 
 char* tokenDeError (char* bufferLexema){
@@ -80,40 +85,39 @@ char* tokenDeError (char* bufferLexema){
 
 char* tokenAceptor (char* bufferLexema){
     char* msjAceptor = (char*) malloc(200);
-    if(strcmp(";",bufferLexema)){
-        strcpy(msjAceptor, "Punto y Coma");
+    if(strcmp(";",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Punto y coma");
     }
-    else if(strcmp("(",bufferLexema)){
-        strcpy(msjAceptor, "Parentesis que abre");
+    else if(strcmp("(",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Parentesis que abre");
     }
-    else if(strcmp(")",bufferLexema)){
-        strcpy(msjAceptor, "Parentesis que cierra");
+    else if(strcmp(")",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Parentesis que cierra");
     }
-    else if(strcmp(",",bufferLexema)){
-        strcpy(msjAceptor, "Coma");
+    else if(strcmp(",",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Coma");
     }
-    else if(strcmp(":=",bufferLexema)){
-        strcpy(msjAceptor, "Asignacion");
+    else if(strcmp(":=",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Asignacion");
     }
-    else if(strcmp("*",bufferLexema)){
-        strcpy(msjAceptor, "Multiplicacion");
+    else if(strcmp("*",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Multiplicacion");
     }
-    else if(strcmp("-",bufferLexema)){
-        strcpy(msjAceptor, "Menos");
+    else if(strcmp("-",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Menos");
     }
-    else if(strcmp("+",bufferLexema)){
-        strcpy(msjAceptor, "Mas");
+    else if(strcmp("+",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Mas");
     }
-    else if(strcmp("/",bufferLexema)){
-        strcpy(msjAceptor, "Division");
+    else if(strcmp("/",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Divisor");
     }
-    else if(strcmp("%",bufferLexema)){
-        strcpy(msjAceptor, "Resto");
+    else if(strcmp("%",bufferLexema)==0){
+        msjAceptor = asignacionDeMensaje("Resto");
     }
     else{
-        strcpy(msjAceptor, "Identificador");
+        msjAceptor = asignacionDeMensaje("Identificador");
     }
-
 }
 
 void scanear(FILE* archivo){

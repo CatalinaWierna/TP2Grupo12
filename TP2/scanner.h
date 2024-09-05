@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 
-
+char* asignacionDeMensaje(const char* mensaje);
 void scanear(FILE* archivo);
 
 #endif //SCANNER_H_INCLUDED
