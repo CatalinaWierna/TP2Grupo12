@@ -80,3 +80,44 @@ int obtenerFila (){
         return estadoAcumulado;
     }
 }
+
+char* obtenerToken(){
+    
+    static char bufferlexema[200];
+    int caracterAscii;
+    int indicebuffer = 0;
+
+    while ((caracterAscii = getc(archivo)) != EOF) {
+    putchar(caracterAscii);
+
+    int columna = obtenerColumna((char)caracterAscii);
+    estadoAcumulado = tablaTransicion[columna][estadoAcumulado];
+
+    if (estadoAcumulado >= ERROR) {
+        bool nuevoLexema = true;
+        bufferlexema[indicebuffer] = '\0'; 
+        estadoAcumulado = INICIO;
+        
+        indicebuffer = 0;
+        return bufferlexema;
+    } 
+    else if (estadoAcumulado >= ACEPTOR) {
+        bool nuevoLexema = true;
+        bufferlexema[indicebuffer] = '\0';
+        estadoAcumulado = INICIO;
+
+        indicebuffer = 0;     
+        return bufferlexema;
+    } 
+    else if (estadoAcumulado >= INTERMEDIO) {
+        bool nuevoLexema = false;
+        bufferlexema[indicebuffer] = caracterAscii;
+
+        indicebuffer++;
+    }
+}
+
+    bufferlexema[indicebuffer] = '\0';
+
+    return bufferlexema;
+}
