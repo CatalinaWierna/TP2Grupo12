@@ -69,16 +69,39 @@ char* asignacionDeMensaje(const char* mensaje){
     return mensajeAceptor;
 }
 
-char* tokenDeError (char* bufferLexema){
-    char* msjError = (char*) malloc(200);
-    if (strcmp("=",bufferLexema)){
-        strcpy(msjError, "Error de asignacion =");
+typedef struct{
+    char* unLexema;
+    char* unMensaje;
+} mensajeLexema;
+
+mensajeLexema casoErrores[] = {
+    {"=", "Error de asignacion ="},
+    {":", "Error de asignacion :"}
+};
+
+mensajeLexema casoAceptacion[] = {
+    {";", "Punto y coma"},
+    {"(", "Parentesis que abre"},
+    {")", "Parentesis que cierra"},
+    {",", "Coma"},
+    {":=", "Asignacion"},
+    {"*", "Multiplicacion"},
+    {"-", "Menos"},
+    {"+", "Mas"},
+    {"/", "Divisor"},
+    {"%", "Resto"}
+};
+
+/*char* tokenDeError (char* bufferLexema){
+    char* msjError = malloc(200);
+    if (strcmp("=",bufferLexema)==0){
+        msjError = asignacionDeMensaje("Error de asignacion =");
     }
-    else if(strcmp(":",bufferLexema)){
-        strcpy(msjError, "Error de asignacion :");
+    else if(strcmp(":",bufferLexema)==0){
+       msjError = asignacionDeMensaje("Error de asignacion :");
     }
     else {
-        strcpy(msjError, "Error comun");
+         msjError = asignacionDeMensaje("Error comun");
     }
     return msjError;
 }
@@ -118,6 +141,25 @@ char* tokenAceptor (char* bufferLexema){
     else{
         msjAceptor = asignacionDeMensaje("Identificador");
     }
+}
+*/
+
+char* tokenDeError (char* bufferLexema){
+    for (int i = 0; i < 2; i++){ // hasta 2 xq hat 2 elementos en ek array de casoErrores
+        if(strcmp(casoErrores[i].unLexema, bufferLexema)==0){
+            return asignacionDeMensaje(casoErrores[i].unMensaje);
+        }
+    }
+    return asignacionDeMensaje("Error Comun"); // funciona como default si no coincide nada
+}
+
+char* tokenAceptor(char* bufferLexema){
+    for (int i = 0; i<10; i++){ // hasta 10 xq hay 10 elementos en el array de casosAceptacion
+        if(strcmp(casoAceptacion[i].unLexema,bufferLexema)==0){
+            return asignacionDeMensaje(casoAceptacion[i].unMensaje);
+        }
+    }
+    return asignacionDeMensaje("Identificador");// funciona como default si no coincide nada
 }
 
 void scanear(FILE* archivo){
