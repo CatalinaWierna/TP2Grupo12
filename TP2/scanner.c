@@ -168,7 +168,7 @@ void scanear(FILE* archivo){
     int caracteresError;
     int caracterAscii;
     int indicebuffer = 0;
-    int estadoAcumulado = 0;
+    estadoAcumulado = 0;
 
     while ((caracterAscii = fgetc(archivo)) != EOF) {
     putchar(caracterAscii);
