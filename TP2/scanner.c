@@ -69,7 +69,7 @@ char* asignacionDeMensaje(const char* mensaje){
     return mensajeAceptor;
 }
 
-typedef struct{
+typedef struct{ // cree este struct para despues crear el tipo de mensaje que retonar en cada caso
     char* unLexema;
     char* unMensaje;
 } mensajeLexema;
