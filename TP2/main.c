@@ -5,7 +5,6 @@ FILE* archivo;
 int main()
 {
     archivo = fopen("../TP2/output/entrada.txt", "r");
-    char* token = NULL;
 
     if (archivo == NULL){
         printf("Contenido vacio en el archivo.\n");
@@ -13,7 +12,7 @@ int main()
         return 1;
     }
     else {
-        scanear(archivo);
+        scanear (archivo);
     }
 
 

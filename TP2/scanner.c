@@ -1,5 +1,5 @@
 #include "scanner.h"
-bool nuevoLexema = true;
+
 int estadoAcumulado; //El estadoAcumulado nos da la fila que nos interesa, si es mayor a 100 sabemos que tenemos que arrancar con un nuevo lexema e iniciar el acumulado en 0
 
 
@@ -56,14 +56,7 @@ int obtenerColumna (char caracter){
 }
 
 
-int obtenerFila (){
-    if(nuevoLexema){
-        return 0;
-    }
-    else{
-        return estadoAcumulado;
-    }
-}
+
 
 int obtenerEstado (char caracter){
     int columna = obtenerColumna(caracter);
@@ -72,66 +65,52 @@ int obtenerEstado (char caracter){
 }
 
 char* tokenDeError (char* bufferLexema){
-    char* msjError = NULL;
+    char* msjError = (char*) malloc(200);
     if (strcmp("=",bufferLexema)){
-        msjError = (char*) malloc(strlen("Error de asignacion =") + 1);
         strcpy(msjError, "Error de asignacion =");
     }
     else if(strcmp(":",bufferLexema)){
-        msjError = (char*) malloc(strlen("Error de asignacion :") + 1);
-        strcpy(msjError, "Error de asignacion =");
+        strcpy(msjError, "Error de asignacion :");
     }
     else {
-        msjError = (char*) malloc(strlen("Error comun") + 1);
         strcpy(msjError, "Error comun");
     }
     return msjError;
 }
 
 char* tokenAceptor (char* bufferLexema){
-    char* msjAceptor = NULL;
+    char* msjAceptor = (char*) malloc(200);
     if(strcmp(";",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Punto y Coma") + 1);
         strcpy(msjAceptor, "Punto y Coma");
     }
     else if(strcmp("(",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Parentesis que abre") + 1);
         strcpy(msjAceptor, "Parentesis que abre");
     }
     else if(strcmp(")",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Parentesis que cierra") + 1);
         strcpy(msjAceptor, "Parentesis que cierra");
     }
     else if(strcmp(",",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Coma") + 1);
         strcpy(msjAceptor, "Coma");
     }
     else if(strcmp(":=",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Asignacion") + 1);
         strcpy(msjAceptor, "Asignacion");
     }
     else if(strcmp("*",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Multiplicacion") + 1);
         strcpy(msjAceptor, "Multiplicacion");
     }
     else if(strcmp("-",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Menos") + 1);
         strcpy(msjAceptor, "Menos");
     }
     else if(strcmp("+",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Mas") + 1);
         strcpy(msjAceptor, "Mas");
     }
     else if(strcmp("/",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Division") + 1);
         strcpy(msjAceptor, "Division");
     }
     else if(strcmp("%",bufferLexema)){
-        msjAceptor = (char*) malloc(strlen("Resto") + 1);
         strcpy(msjAceptor, "Resto");
     }
     else{
-        msjAceptor = (char*) malloc(strlen("Identificador") + 1);
         strcpy(msjAceptor, "Identificador");
     }
 
@@ -163,7 +142,6 @@ void scanear(FILE* archivo){
         char* error = tokenDeError (bufferlexema);
         printf("%s   %s\n",error,bufferlexema);
         free(error);
-        bool nuevoLexema = true;
         estadoAcumulado = INICIO;
         indicebuffer = 0;
         memset(bufferlexema,'\0',200); //Esto pone en cero al buffer  
@@ -176,12 +154,10 @@ void scanear(FILE* archivo){
         printf("%s   %s\n",aceptor,bufferlexema);
         free(aceptor);
         estadoAcumulado = INICIO;
-        bool nuevoLexema = true;
         indicebuffer = 0;
         memset(bufferlexema,'\0',200);     
     } 
     else if (estadoAcumulado >= INTERMEDIO) {
-        bool nuevoLexema = false;
         bufferlexema[indicebuffer] = caracterAscii;
         bufferlexema[indicebuffer+1]='\0';
         indicebuffer++;
