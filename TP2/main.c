@@ -15,7 +15,6 @@ int main()
         scanear (archivo);
     }
 
-
     fclose(archivo);
     return 0;
 }

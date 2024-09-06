@@ -43,10 +43,10 @@ int obtenerColumna (char caracter){
     else if(esPuntuacion(caracter)){
         return 4;
     }
-    else if (caracter==':'){
+    else if (caracter == ':'){
         return 5;
     }
-    else if(caracter=='='){
+    else if(caracter == '='){
         return 6;
     }
     else{
@@ -57,7 +57,7 @@ int obtenerColumna (char caracter){
 
 int obtenerEstado (char caracter){
     int columna = obtenerColumna(caracter);
-    return tablaTransicion[columna][estadoAcumulado];
+    return tablaTransicion[estadoAcumulado][columna];
 
 }
 
@@ -84,65 +84,13 @@ mensajeLexema casoAceptacion[] = {
     {"(", "Parentesis que abre"},
     {")", "Parentesis que cierra"},
     {",", "Coma"},
-    {":=", "Asignacion"},
+    {":=","Asignacion"},
     {"*", "Multiplicacion"},
     {"-", "Menos"},
     {"+", "Mas"},
     {"/", "Divisor"},
     {"%", "Resto"}
 };
-
-/*char* tokenDeError (char* bufferLexema){
-    char* msjError = malloc(200);
-    if (strcmp("=",bufferLexema)==0){
-        msjError = asignacionDeMensaje("Error de asignacion =");
-    }
-    else if(strcmp(":",bufferLexema)==0){
-       msjError = asignacionDeMensaje("Error de asignacion :");
-    }
-    else {
-         msjError = asignacionDeMensaje("Error comun");
-    }
-    return msjError;
-}
-
-char* tokenAceptor (char* bufferLexema){
-    char* msjAceptor = (char*) malloc(200);
-    if(strcmp(";",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Punto y coma");
-    }
-    else if(strcmp("(",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Parentesis que abre");
-    }
-    else if(strcmp(")",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Parentesis que cierra");
-    }
-    else if(strcmp(",",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Coma");
-    }
-    else if(strcmp(":=",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Asignacion");
-    }
-    else if(strcmp("*",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Multiplicacion");
-    }
-    else if(strcmp("-",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Menos");
-    }
-    else if(strcmp("+",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Mas");
-    }
-    else if(strcmp("/",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Divisor");
-    }
-    else if(strcmp("%",bufferLexema)==0){
-        msjAceptor = asignacionDeMensaje("Resto");
-    }
-    else{
-        msjAceptor = asignacionDeMensaje("Identificador");
-    }
-}
-*/
 
 char* tokenDeError (char* bufferLexema){
     for (int i = 0; i < 2; i++){ // hasta 2 xq hat 2 elementos en ek array de casoErrores
@@ -164,51 +112,52 @@ char* tokenAceptor(char* bufferLexema){
 
 void scanear(FILE* archivo){
     
-    static char bufferlexema[200];
+    char bufferlexema[200];
     int caracteresError;
     int caracterAscii;
     int indicebuffer = 0;
     estadoAcumulado = 0;
 
-    while ((caracterAscii = fgetc(archivo)) != EOF) {
-    putchar(caracterAscii);
+    while ((caracterAscii = getc(archivo)) != EOF) {
 
-    estadoAcumulado = obtenerEstado ((char)caracterAscii);
+        estadoAcumulado = obtenerEstado ((char)caracterAscii);
+        //printf("el caracter ascii es: '%c'\n", (char) caracterAscii);
+        //printf("el estado acumulado es: '%i'\n", estadoAcumulado);
 
-    if (estadoAcumulado >= ERROR) {
-        while ((caracteresError = getc(archivo)) != EOF){//Tuve que agregar este bucle, ya que si hay un caracter que tira error, hay que leer toda la cadena hasta que finaliza
-            if(isspace((char)caracteresError)){
-                break;
+        if (estadoAcumulado >= ERROR) {
+            while ((caracteresError = getc(archivo)) != EOF){//Tuve que agregar este bucle, ya que si hay un caracter que tira error, hay que leer toda la cadena hasta que finaliza
+                if(isspace((char)caracteresError)){
+                    break;
+                }
+                else{
+                    bufferlexema[indicebuffer] = caracteresError;
+                    bufferlexema[indicebuffer+1]='\0';
+                    indicebuffer++;
+                }
             }
-            else{
-                bufferlexema[indicebuffer] = caracteresError;
-                bufferlexema[indicebuffer+1]='\0';
-                indicebuffer++;
+            char* error = tokenDeError (bufferlexema);
+            printf("%s   %s\n",error,bufferlexema);
+            free(error);
+            estadoAcumulado = INICIO;
+            indicebuffer = 0;
+            memset(bufferlexema,'\0',200); //Esto pone en cero al buffer  
+        } 
+        else if (estadoAcumulado >= ACEPTOR) {
+            if(!isspace(caracterAscii)){//Tengo que chequear que el siguiente caracter no sea parte de otro lexema, si lo es lo vuelvo a dejar en el flujo Ej: 4+5
+                ungetc(caracterAscii,archivo);
             }
+            char* aceptor = tokenAceptor(bufferlexema);
+            printf("Se encontro '%s' y es '%s'\n",aceptor,bufferlexema);
+            free(aceptor);
+            estadoAcumulado = INICIO;
+            indicebuffer = 0;
+            memset(bufferlexema,'\0',200);     
+        } 
+        else if (estadoAcumulado >= INTERMEDIO) {
+            bufferlexema[indicebuffer] = caracterAscii;
+            bufferlexema[indicebuffer+1]='\0';
+            indicebuffer++;
         }
-        char* error = tokenDeError (bufferlexema);
-        printf("%s   %s\n",error,bufferlexema);
-        free(error);
-        estadoAcumulado = INICIO;
-        indicebuffer = 0;
-        memset(bufferlexema,'\0',200); //Esto pone en cero al buffer  
-    } 
-    else if (estadoAcumulado >= ACEPTOR) {
-        if(!isspace(caracterAscii)){//Tengo que chequear que el siguiente caracter no sea parte de otro lexema, si lo es lo vuelvo a dejar en el flujo Ej: 4+5
-            ungetc(caracterAscii,archivo);
-        }
-        char* aceptor = tokenAceptor(bufferlexema);
-        printf("%s   %s\n",aceptor,bufferlexema);
-        free(aceptor);
-        estadoAcumulado = INICIO;
-        indicebuffer = 0;
-        memset(bufferlexema,'\0',200);     
-    } 
-    else if (estadoAcumulado >= INTERMEDIO) {
-        bufferlexema[indicebuffer] = caracterAscii;
-        bufferlexema[indicebuffer+1]='\0';
-        indicebuffer++;
     }
-}
-
+    
 }
