@@ -10,5 +10,6 @@
 
 char* asignacionDeMensaje(const char* mensaje);
 void scanear(FILE* archivo);
+bool esAsignacion(char* bufferlexema);
 
 #endif //SCANNER_H_INCLUDED

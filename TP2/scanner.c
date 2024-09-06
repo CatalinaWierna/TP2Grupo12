@@ -1,6 +1,6 @@
 #include "scanner.h"
 
-int estadoAcumulado; //El estadoAcumulado nos da la fila que nos interesa, si es mayor a 100 sabemos que tenemos que arrancar con un nuevo lexema e iniciar el acumulado en 0
+int estadoAcumulado; 
 
 
 
@@ -69,14 +69,14 @@ char* asignacionDeMensaje(const char* mensaje){
     return mensajeAceptor;
 }
 
-typedef struct{ // cree este struct para despues crear el tipo de mensaje que retonar en cada caso
+typedef struct{ 
     char* unLexema;
     char* unMensaje;
 } mensajeLexema;
 
 mensajeLexema casoErrores[] = {
-    {"=", "Error de asignacion ="},
-    {":", "Error de asignacion :"}
+    {"=", "Error en asignacion por = solo"},
+    {":", "Error de asignacion por : solo"}
 };
 
 mensajeLexema casoAceptacion[] = {
@@ -93,21 +93,27 @@ mensajeLexema casoAceptacion[] = {
 };
 
 char* tokenDeError (char* bufferLexema){
-    for (int i = 0; i < 2; i++){ // hasta 2 xq hat 2 elementos en ek array de casoErrores
+    for (int i = 0; i < 2; i++){ 
         if(strcmp(casoErrores[i].unLexema, bufferLexema)==0){
             return asignacionDeMensaje(casoErrores[i].unMensaje);
         }
     }
-    return asignacionDeMensaje("Error Comun"); // funciona como default si no coincide nada
+    return asignacionDeMensaje("Error Comun"); 
 }
 
 char* tokenAceptor(char* bufferLexema){
-    for (int i = 0; i<10; i++){ // hasta 10 xq hay 10 elementos en el array de casosAceptacion
+    for (int i = 0; i<10; i++){ 
         if(strcmp(casoAceptacion[i].unLexema,bufferLexema)==0){
             return asignacionDeMensaje(casoAceptacion[i].unMensaje);
         }
     }
-    return asignacionDeMensaje("Identificador");// funciona como default si no coincide nada
+
+    if(isdigit(bufferLexema[0]))
+    {
+        return asignacionDeMensaje("Constante");
+    }
+
+    return asignacionDeMensaje("Identificador");
 }
 
 void scanear(FILE* archivo){
@@ -121,11 +127,21 @@ void scanear(FILE* archivo){
     while ((caracterAscii = getc(archivo)) != EOF) {
 
         estadoAcumulado = obtenerEstado ((char)caracterAscii);
-        //printf("el caracter ascii es: '%c'\n", (char) caracterAscii);
-        //printf("el estado acumulado es: '%i'\n", estadoAcumulado);
+        
 
         if (estadoAcumulado >= ERROR) {
-            while ((caracteresError = getc(archivo)) != EOF){//Tuve que agregar este bucle, ya que si hay un caracter que tira error, hay que leer toda la cadena hasta que finaliza
+
+            if (!(caracterAscii == '=') && !(caracterAscii == ':') && !(caracterAscii == '\n'))
+            {
+
+                
+                bufferlexema[indicebuffer] = caracterAscii;
+                bufferlexema[indicebuffer+1]='\0';
+                indicebuffer++;
+            }
+            
+
+            while ((caracteresError = getc(archivo)) != EOF){
                 if(isspace((char)caracteresError)){
                     break;
                 }
@@ -135,15 +151,21 @@ void scanear(FILE* archivo){
                     indicebuffer++;
                 }
             }
+
             char* error = tokenDeError (bufferlexema);
             printf("%s   %s\n",error,bufferlexema);
             free(error);
             estadoAcumulado = INICIO;
             indicebuffer = 0;
-            memset(bufferlexema,'\0',200); //Esto pone en cero al buffer  
+            memset(bufferlexema,'\0',200);  
         } 
         else if (estadoAcumulado >= ACEPTOR) {
-            if(!isspace(caracterAscii)){//Tengo que chequear que el siguiente caracter no sea parte de otro lexema, si lo es lo vuelvo a dejar en el flujo Ej: 4+5
+            if(caracterAscii == '='){
+                bufferlexema[indicebuffer] = caracterAscii;
+                bufferlexema[indicebuffer+1]='\0';
+            } 
+
+            if(!isspace(caracterAscii) && !esAsignacion(bufferlexema)){
                 ungetc(caracterAscii,archivo);
             }
             char* aceptor = tokenAceptor(bufferlexema);
@@ -157,7 +179,22 @@ void scanear(FILE* archivo){
             bufferlexema[indicebuffer] = caracterAscii;
             bufferlexema[indicebuffer+1]='\0';
             indicebuffer++;
+            
         }
     }
+
+    char* aceptor = tokenAceptor(bufferlexema);
+    printf("Se encontro '%s' y es '%s'\n",aceptor,bufferlexema);
+    free(aceptor);
+    estadoAcumulado = INICIO;
     
+    
+    
+}
+
+bool esAsignacion( char* bufferlexema)
+{
+    
+    return (strcmp(bufferlexema, ":=") == 0);
+
 }
